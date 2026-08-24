@@ -1,0 +1,18 @@
+[project]
+name = "kadr"
+version = "0.1.0"
+description = "KADR - lokalny system iteracyjnego montażu krótkich wideo"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pyyaml",
+    "pillow",
+    "numpy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "httpx"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
