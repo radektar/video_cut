@@ -29,5 +29,12 @@
 - **D-007 (F2):** Dodatkowy endpoint `GET /api/fonts` (lista fontów systemowych) dla
   dropdownu w panelu preferencji — spec wymienia go w sekcji 10.5/14, ale nie w tabeli
   sekcji 9; dopisany jako najprostsza interpretacja.
+- **D-009 (F2):** `meta.created_by` w `edl.json` oznacza ostatniego zapisującego
+  (`agent` | `ui`), nie pierwotnego twórcę — najprostsza interpretacja spójna z
+  detekcją konfliktu UI↔agent.
+- **D-010 (F2):** Poza tabelą z sekcji 9 dodane pomocnicze endpointy: `GET /api/fonts`
+  (dropdown fontów, sekcja 10.5) i `GET /api/transcribe/status` (transkrypcja działa
+  w tle, UI może sprawdzić stan). `PUT /api/edl?force=true` realizuje „ostatni wygrywa
+  po potwierdzeniu w UI" przy konflikcie 409.
 - **D-008 (F1):** Hash `edl_sha256` w manifeście liczony z kanonicznego JSON
   (sort_keys) pliku `edl.json` skopiowanego do wersji.

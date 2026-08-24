@@ -100,7 +100,7 @@ def save_edl(project: Path, edl: dict, created_by: str = "agent") -> dict:
     if errors:
         raise ValueError("edl.json niepoprawny: " + "; ".join(errors))
     meta = edl.setdefault("meta", {})
-    meta.setdefault("created_by", created_by)
+    meta["created_by"] = created_by  # ostatni zapisujący: agent | ui (D-009)
     meta["updated_at"] = now_iso()
     path = edl_path(project)
     path.parent.mkdir(parents=True, exist_ok=True)
