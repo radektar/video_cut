@@ -35,7 +35,8 @@ DEFAULT_PREFERENCES: dict = {
 
 ALLOWED_FORMATS = ("9x16", "16x9", "1x1")
 
-KADR_HOME = Path(os.environ.get("KADR_HOME", Path.home() / ".kadr"))
+def kadr_home() -> Path:
+    return Path(os.environ.get("KADR_HOME", Path.home() / ".kadr"))
 
 
 def edit_dir(project: Path) -> Path:
@@ -100,7 +101,7 @@ def save_preferences(project: Path, prefs: dict) -> None:
 def write_default_preferences(project: Path) -> Path:
     """Przy `kadr init`: kopiuje ~/.kadr/preferences.yaml, a gdy brak — domyślne."""
     path = preferences_path(project)
-    global_prefs = KADR_HOME / "preferences.yaml"
+    global_prefs = kadr_home() / "preferences.yaml"
     if global_prefs.exists():
         path.write_text(global_prefs.read_text())
     else:
