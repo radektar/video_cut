@@ -5,6 +5,7 @@ Reguły produkcyjne: ekstrakcja per segment → concat -c copy → finalny przeb
 """
 from __future__ import annotations
 
+import functools
 import subprocess
 import tempfile
 import time
@@ -45,6 +46,18 @@ def resolve_fps(prefs: dict, edl: dict, media: dict) -> float:
     r = next(x for x in edl["ranges"] if x["id"] == first_id)
     stem = Path(edl["sources"][r["source"]]).stem
     return float(media["sources"][stem]["fps"])
+
+
+@functools.lru_cache(maxsize=None)
+def ffmpeg_has_filter(name: str) -> bool:
+    """Czy ten build ffmpeg ma dany filtr (np. 'ass' wymaga libass)."""
+    out = subprocess.run(["ffmpeg", "-hide_banner", "-filters"],
+                         capture_output=True, text=True).stdout
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) >= 2 and parts[1] == name:
+            return True
+    return False
 
 
 def _run_ffmpeg(args: list[str], log) -> None:
@@ -134,10 +147,16 @@ def render_format(
         if gf:
             vf.append(gf)
         if subtitles.has_subtitles(edl):
+            if not ffmpeg_has_filter("ass"):
+                raise RuntimeError(
+                    "Ten ffmpeg jest zbudowany bez libass (brak filtra 'ass') — nie mogę "
+                    "wypalić napisów. Zainstaluj ffmpeg z libass, np. `brew reinstall ffmpeg`."
+                )
             subtitles.validate_font(prefs["subtitles"]["font_family"])
             ass_path = vdir / f"master-{fmt}.ass"
             ass_path.write_text(subtitles.build_ass(edl, transcripts, prefs, fmt))
-            escaped = str(ass_path).replace("\\", "\\\\").replace("'", "\\'").replace(":", "\\:")
+            # Escaping filtra ffmpeg: wewnątrz '...' escapujemy tylko \ i ' (NIE :).
+            escaped = str(ass_path).replace("\\", "\\\\").replace("'", "\\'")
             vf.append(f"ass='{escaped}'")
         # loudnorm na całkowitej ciszy (wszystko zmutowane) daje NaN w ffmpeg — pomiń
         any_audio = any(not ranges[rid].get("mute") for rid in order)

@@ -1,11 +1,15 @@
 import json
 import subprocess
 
+import pytest
+
 import kadr
 from pipeline import config, edl as edl_mod, render
 
 
 def test_full_pipeline_renders_versions(transcribed_project):
+    if not render.ffmpeg_has_filter("ass"):
+        pytest.skip("ffmpeg zbudowany bez libass — nie można wypalić napisów")
     proj = transcribed_project
     assert kadr.main(["plan", "--auto", "--project", str(proj)]) == 0
     assert kadr.main(["plan", "--check", "--project", str(proj)]) == 0
@@ -75,3 +79,16 @@ def test_render_16x9_and_mute(transcribed_project):
         capture_output=True, text=True).stderr
     max_line = next(line for line in det.splitlines() if "max_volume" in line)
     assert "-91.0 dB" in max_line or float(max_line.split()[-2]) < -60
+
+
+def test_subtitles_without_libass_raises_clear_error(transcribed_project, monkeypatch):
+    """Render z napisami na ffmpeg bez filtra 'ass' → czytelny błąd, nie krypticzny ffmpeg."""
+    proj = transcribed_project
+    kadr.main(["plan", "--auto", "--project", str(proj)])
+    edl = edl_mod.load_edl(proj)
+    edl["order"] = edl["order"][:1]
+    edl["ranges"][0]["subtitles"] = True
+    edl_mod.save_edl(proj, edl)
+    monkeypatch.setattr(render, "ffmpeg_has_filter", lambda name: False)
+    with pytest.raises(RuntimeError, match="zbudowany bez libass"):
+        render.render_project(proj, proxy_render=True)
