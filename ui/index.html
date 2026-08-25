@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <title>KADR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">KADR <span id="projectName"></span></div>
+    <div id="totalTime" title="łączny czas montażu">0:00.0</div>
+    <div id="saveIndicator" class="save-ok">zapisano</div>
+    <div class="spacer"></div>
+    <input id="renderNote" type="text" placeholder="notatka do wersji…">
+    <button id="btnRenderProxy">Renderuj wersję (proxy)</button>
+    <button id="btnRenderFinal" class="primary">Renderuj final</button>
+  </header>
+
+  <div id="renderProgress" class="hidden">
+    <div class="bar"><div id="renderBar"></div></div>
+    <span id="renderPct">0%</span>
+    <pre id="renderLog"></pre>
+  </div>
+
+  <main id="layout">
+    <section id="previewPane">
+      <div id="videoWrap">
+        <video id="preview" playsinline></video>
+        <div id="subOverlay"></div>
+        <div id="cropFrame" class="hidden" title="przeciągnij, aby ustawić kadr"></div>
+      </div>
+      <div id="previewControls">
+        <button id="btnPlay">▶ Odtwórz sekwencję</button>
+        <button id="btnStop">■ Stop</button>
+        <span id="playInfo"></span>
+      </div>
+      <div id="versionsBar">
+        <span class="label">Wersje:</span>
+        <div id="versionsList"></div>
+      </div>
+      <div id="compareWrap" class="hidden">
+        <video id="compareVideo" controls></video>
+        <div id="compareLabel"></div>
+      </div>
+    </section>
+
+    <section id="segmentsPane">
+      <h2>Segmenty <button id="btnReload" title="przeładuj stan z dysku">⟳</button></h2>
+      <div id="segmentsList"></div>
+      <h3>Kosz</h3>
+      <div id="trashList"></div>
+    </section>
+
+    <section id="settingsPane">
+      <div id="trimPanel" class="hidden">
+        <h2>Trymowanie <span id="trimId"></span></h2>
+        <div class="boundary" id="boundaryStart"></div>
+        <div class="boundary" id="boundaryEnd"></div>
+        <div class="cropTools hidden" id="cropTools">
+          <button id="btnCropAll">zastosuj kadr do wszystkich z tego źródła</button>
+          <span id="cropVal"></span>
+        </div>
+      </div>
+      <h2>Preferencje</h2>
+      <div id="prefsPanel"></div>
+    </section>
+  </main>
+
+  <dialog id="conflictDialog">
+    <p>EDL zmieniony poza UI (np. przez agenta).</p>
+    <div class="row">
+      <button id="btnConflictReload">Przeładuj z dysku</button>
+      <button id="btnConflictOverwrite" class="danger">Nadpisz moją wersją</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
