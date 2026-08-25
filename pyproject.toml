@@ -14,5 +14,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest", "httpx"]
 
+[tool.setuptools]
+packages = ["pipeline", "server"]
+py-modules = ["kadr"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
